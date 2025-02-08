@@ -236,11 +236,14 @@ export default function Frame() {
     }
   }, [context?.user?.fid, fetchNutStats]);
 
+  const handleShare = useCallback(() => {
+    const frameUrl = `${window.location.origin}/frames/acorntracker`;
+    sdk.actions.openUrl(`https://warpcast.com/~/compose?text=Check%20my%20🥜%20stats&embeds[]=${encodeURIComponent(frameUrl)}`);
+  }, []);
+
   if (!isSDKLoaded) {
     return <div>Loading...</div>;
   }
-
-  const handleShare = useCallback(() => {
     const frameUrl = `${window.location.origin}/frames/acorntracker`;
     sdk.actions.openUrl(`https://warpcast.com/~/compose?text=Check%20my%20🥜%20stats&embeds[]=${encodeURIComponent(frameUrl)}`);
   }, []);

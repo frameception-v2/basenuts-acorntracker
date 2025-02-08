@@ -186,11 +186,7 @@ export default function Frame() {
     }
   }, [isSDKLoaded, addFrame]);
 
-  if (!isSDKLoaded) {
-    return <div>Loading...</div>;
-  }
-
-  // Move all hook declarations to the top
+  // Moved hooks to top level
   const fetchNutStats = useCallback(async (fid: number) => {
     try {
       const response = await fetch(`${NEYNAR_CONFIG.HUB_URL}/v1/reactions?type=🥜&fid=${fid}`, {
@@ -238,7 +234,11 @@ export default function Frame() {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [context?.user?.fid, fetchNutStats]); // Add dependencies array
+  }, [context?.user?.fid, fetchNutStats]);
+
+  if (!isSDKLoaded) {
+    return <div>Loading...</div>;
+  }
 
   const handleShare = useCallback(() => {
     const frameUrl = `${window.location.origin}/frames/acorntracker`;

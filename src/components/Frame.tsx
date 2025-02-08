@@ -21,6 +21,8 @@ import { useSession } from "next-auth/react";
 import { createStore } from "mipd";
 import { Label } from "~/components/ui/label";
 import { PROJECT_TITLE } from "~/lib/constants";
+import { PurpleButton } from "~/components/ui/PurpleButton";
+import Image from "next/image";
 
 interface NutStats {
   fid: number;
@@ -54,10 +56,13 @@ function StatsCard({ stats }: { stats: NutStats }) {
       <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-amber-600/10" />
       <CardHeader>
         <div className="flex items-center gap-4">
-          <img 
-            src={stats.profile.pfpUrl} 
+          <Image
+            src={stats.profile.pfpUrl}
             alt="Profile"
-            className="w-12 h-12 rounded-full border-2 border-amber-600"
+            width={48}
+            height={48}
+            className="rounded-full border-2 border-amber-600"
+            priority
           />
           <div>
             <CardTitle>{stats.profile.displayName}</CardTitle>
@@ -96,12 +101,13 @@ function StatsCard({ stats }: { stats: NutStats }) {
 }
 
 export default function Frame() {
+  // State hooks must be declared unconditionally at the top level
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [context, setContext] = useState<Context.FrameContext>();
-
   const [added, setAdded] = useState(false);
-
   const [addFrameResult, setAddFrameResult] = useState("");
+  const [stats, setStats] = useState<NutStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const addFrame = useCallback(async () => {
     try {
@@ -184,9 +190,7 @@ export default function Frame() {
     return <div>Loading...</div>;
   }
 
-  const [stats, setStats] = useState<NutStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
+  // Move all hook declarations to the top
   const fetchNutStats = useCallback(async (fid: number) => {
     try {
       const response = await fetch(`${NEYNAR_CONFIG.HUB_URL}/v1/reactions?type=🥜&fid=${fid}`, {
@@ -232,10 +236,9 @@ export default function Frame() {
       const interval = setInterval(() => {
         fetchNutStats(context.user.fid);
       }, 1000);
-
       return () => clearInterval(interval);
     }
-  }, [context?.user?.fid, fetchNutStats]);
+  }, [context?.user?.fid, fetchNutStats]); // Add dependencies array
 
   const handleShare = useCallback(() => {
     const frameUrl = `${window.location.origin}/frames/acorntracker`;
